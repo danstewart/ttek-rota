@@ -3,6 +3,7 @@
 ## Project setup
 ```
 npm install
+npm install -g serverless
 ```
 
 ### Set serverless credentials
