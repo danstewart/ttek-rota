@@ -1,0 +1,21 @@
+# Package directories
+.DS_Store
+node_modules
+jspm_packages
+/dist
+
+# Local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+
+# Editor directories and files
+.vscode
+
+# Serverless directories
+.serverless
+
+# Secrets
+secrets.json
