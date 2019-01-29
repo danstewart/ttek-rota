@@ -59,13 +59,14 @@ export default {
 
 	data() {
 		return {
+			endpoint: 'http://127.0.0.1:3000',
 			registering: false,
 			errors: [],
 		}
 	},
 
 	methods: {
-		login() {
+		async login() {
 			let email    = document.getElementById('email').value
 			let password = document.getElementById('password').value
 
@@ -74,11 +75,15 @@ export default {
 			if (this.errors.length)
 				return
 
-			// TODO: Get Token
-			this.$store.commit('setToken', 'blahblahblah')
+			try {
+				let res = await axios.post(`${this.endpoint}/token`, { email: email, password: password })
+				this.$store.commit('setToken', res.data.token)
+			} catch (err) {
+				this.errors.push(err.response.data.message || 'Unknown error')
+			}
 		},
 
-		register() {
+		async register() {
 			let email           = document.getElementById('email').value
 			let password        = document.getElementById('password').value
 			let passwordConfirm = document.getElementById('password-confirm').value
@@ -88,8 +93,14 @@ export default {
 			if (this.errors.length)
 				return
 
-			// TODO: Send register request
-			this.login(email, password)
+			let res = await axios.post(`${this.endpoint}/register`, { email: email, password: password })
+
+			if (res.body.success) {
+				this.$store.commit('setFirstLogin')
+				this.login(email, password)
+			} else {
+				this.errors.push(res.body.message)
+			}
 		},
 
 		validate(email, password, passwordConfirm = '') {

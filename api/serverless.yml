@@ -44,5 +44,13 @@ functions:
           method: post
           cors: true
 
+  register:
+    handler: auth/AuthHandler.register
+    events:
+      - http:
+          path: /register
+          method: post
+          cors: true
+
 plugins:
   - serverless-offline

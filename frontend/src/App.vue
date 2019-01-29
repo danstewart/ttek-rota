@@ -9,6 +9,12 @@
 		</section>
 
 		<div class='main-body'>
+			<div class='notification is-success' style='width: 100%' v-if='$store.getters.firstLogin'>
+				<h1 class='title'>You have successfully signed up</h1>
+				<h1 class='subtitle'>Welcome to the support rota</h1>
+				<button class='delete' @click='$store.commit("setFirstLogin", false)'></button>
+			</div>
+
 			<div v-if='$store.getters.token'>
 				<div class='columns'>
 					<div class='column left-pane'>

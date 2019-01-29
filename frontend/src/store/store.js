@@ -19,7 +19,7 @@ export const store = new Vuex.Store({
 			localStorage.setItem('token', token)
 		},
 
-		setFirstLogin: (state)   => state.firstLogin = true,
+		setFirstLogin: (state, val = true) => state.firstLogin = val,
 
 		setWarnings(state, warning) {
 			if (warning.items.length == 0) {
@@ -62,6 +62,7 @@ export const store = new Vuex.Store({
 
 	getters: {
 		changes: state => state.changes,
+		firstLogin: state => state.firstLogin,
 		warnings: state => state.warnings,
 		notes: state => state.notes,
 		token: state => state.token,
