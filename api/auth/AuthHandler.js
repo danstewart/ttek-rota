@@ -12,6 +12,16 @@ module.exports.getToken = async (event, context) => {
 
 	try {
 		let user  = await User.findOne({ email: body.email })
+
+		if (!user || !user.password) {
+			return {
+				statusCode: 401,
+				body: JSON.stringify({
+					message: 'User does not have an account'
+				})
+			}
+		}
+
 		let match = await checkPassword(body.password, user.password)
 
 		if (!match) {
@@ -44,14 +54,14 @@ module.exports.register = async (event, context) => {
 
 	let body = JSON.parse(event.body)
 
-	// Since we preload the users we need to add passwords for existing users
-	// and sign up new users
+	// Since support users are loaded before creating accounts we need to 
+	// allow them to add passwords to their existing accounts
 	try {
 		let user = await User.findOne({ email: body.email })
 
 		if (user.password) {
 			return {
-				statusCode: 200,
+				statusCode: 422,
 				body: JSON.stringify({
 					message: 'A user with that email already exists'
 				})
