@@ -1,5 +1,5 @@
 <template>
-	<div class='login-form'>
+	<div class='login'>
 		<div class='columns'>
 			<div class='column is-half'>
 				<p class='subtitle'>Enter your email address and you'll receive a magic login link</p>
@@ -55,7 +55,7 @@
 import axios from 'axios'
 
 export default {
-	name: 'LoginForm',
+	name: 'Login',
 
 	data() {
 		return {
@@ -80,7 +80,10 @@ export default {
 				this.$store.commit('setToken', res.data.token)
 			} catch (err) {
 				this.errors.push(err.response.data.message || 'Unknown error')
+				return
 			}
+
+			this.$router.push('/')
 		},
 
 		async register() {
@@ -93,14 +96,16 @@ export default {
 			if (this.errors.length)
 				return
 
-			let res = await axios.post(`${this.endpoint}/register`, { email: email, password: password })
 
-			if (res.body.success) {
+			try {
+				await axios.post(`${this.endpoint}/register`, { email: email, password: password })
 				this.$store.commit('setFirstLogin')
-				this.login(email, password)
-			} else {
-				this.errors.push(res.body.message)
+			} catch (err) {
+				this.errors.push(err.response.data.message || 'Unknown error')
+				return
 			}
+
+			this.login(email, password)
 		},
 
 		validate(email, password, passwordConfirm = '') {

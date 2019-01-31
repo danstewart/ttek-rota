@@ -9,25 +9,7 @@
 		</section>
 
 		<div class='main-body'>
-			<div class='notification is-success' style='width: 100%' v-if='$store.getters.firstLogin'>
-				<h1 class='title'>You have successfully signed up</h1>
-				<h1 class='subtitle'>Welcome to the support rota</h1>
-				<button class='delete' @click='$store.commit("setFirstLogin", false)'></button>
-			</div>
-
-			<div v-if='$store.getters.token'>
-				<div class='columns'>
-					<div class='column left-pane'>
-						<Rota></Rota>
-					</div>
-					<div class='column is-4 right-pane'>
-						<Sidebar></Sidebar>
-					</div>
-				</div>
-			</div>
-			<div v-else>
-				<LoginForm></LoginForm>
-			</div>
+			<router-view></router-view>
 		</div>
 
 		<!-- External stuff -->
@@ -36,17 +18,8 @@
 </template>
 
 <script>
-import Rota from './components/Rota.vue'
-import Sidebar from './components/Sidebar.vue'
-import LoginForm from './components/LoginForm.vue'
-
 export default {
 	name: 'app',
-	components: {
-		Rota,
-		Sidebar,
-		LoginForm,
-	}
 }
 </script>
 
@@ -69,14 +42,6 @@ export default {
 .main-body {
 	margin-left: 20px;
 	margin-right: 20px;
-}
-
-.left-pane {
-	overflow: auto;
-}
-
-.right-pane {
-	margin-top: 20px;
 }
 
 /* My overrides */
