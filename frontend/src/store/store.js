@@ -8,8 +8,8 @@ export const store = new Vuex.Store({
 		changes:  {},
 		warnings: {},
 		notes:    {},
+		notifications: [],
 		token: localStorage.getItem('token') || '',
-		firstLogin: false,
 	},
 	
 	mutations: {
@@ -18,8 +18,6 @@ export const store = new Vuex.Store({
 			state.token = token
 			localStorage.setItem('token', token)
 		},
-
-		setFirstLogin: (state, val = true) => state.firstLogin = val,
 
 		setWarnings(state, warning) {
 			if (warning.items.length == 0) {
@@ -44,6 +42,11 @@ export const store = new Vuex.Store({
 			})
 		},
 
+		addNotification(state, notif) {
+			notif.type = notif.type || 'is-primary'
+			state.notifications.push(notif)
+		},
+
 		// Removing individual items
 		removeChange(state, change) {
 			if (state.changes.hasOwnProperty(change.week)) {
@@ -52,6 +55,10 @@ export const store = new Vuex.Store({
 				if (Object.keys(state.changes[change.week]) == 0)
 					Vue.delete(state.changes, change.week)
 			}
+		},
+
+		removeNotification(state, id) {
+			state.notifications.splice(id, 1)
 		},
 		
 		// Emptying
@@ -62,9 +69,9 @@ export const store = new Vuex.Store({
 
 	getters: {
 		changes: state => state.changes,
-		firstLogin: state => state.firstLogin,
 		warnings: state => state.warnings,
 		notes: state => state.notes,
 		token: state => state.token,
+		notifications: state => state.notifications,
 	}
 })

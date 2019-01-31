@@ -72,8 +72,7 @@ export default {
 
 			// Validate
 			this.validate(email, password)
-			if (this.errors.length)
-				return
+			if (this.errors.length) { return }
 
 			try {
 				let res = await axios.post(`${this.endpoint}/token`, { email: email, password: password })
@@ -93,13 +92,11 @@ export default {
 
 			// Validate
 			this.validate(email, password, passwordConfirm)
-			if (this.errors.length)
-				return
-
+			if (this.errors.length) { return }
 
 			try {
 				await axios.post(`${this.endpoint}/register`, { email: email, password: password })
-				this.$store.commit('setFirstLogin')
+				this.$store.commit('addNotification', { title: 'Registration successful', subtitle: 'Welcome to the Traveltek Support rota' })
 			} catch (err) {
 				this.errors.push(err.response.data.message || 'Unknown error')
 				return
@@ -125,7 +122,7 @@ export default {
 				if (password == '')
 					this.errors.push('Password cannot be blank')
 			}
-		}
+		},
 	}
 }
 </script>
