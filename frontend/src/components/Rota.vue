@@ -63,9 +63,13 @@ export default {
 			// Fetch out the required staff info
 			let people = this.staff.slice().sort((a, b) => a.orderid - b.orderid)
 			let shiftWorkers = people.filter(person => person.shifts).map(person => person.name)
+			let otherWorkers = people.filter(person => !person.shifts).map(person => person.name)
 
 			let rota   = []
 			let weekNo = week
+
+			let changes  = this.$store.getters.changes
+			let warnings = []
 
 			// Rotate shift pattern $offset times
 			if (this.offset > 0) {
@@ -77,14 +81,10 @@ export default {
 			// Build the rota
 			while (rota.length < limit) {
 				let thisWeek = {}
-				let weekDate = format(startOfWeek(addWeeks(new Date(year, 0, 1), weekNo - 1), { weekStartsOn: 1 }), 'YYYY-MM-DD')
-
-				// NOTE: Shallow clone
-				let workers = shiftWorkers.slice(0)
+				let weekDate = format(startOfWeek(addWeeks(new Date(year, 0, 1), weekNo - 1), { weekStartsOn: 1 }), 'DD MMM YYYY')
 
 				// Check for changes
 				let overrides = {}
-				let changes = this.$store.getters.changes
 				if (changes[weekDate]) {
 					people.forEach(person => {
 						if (changes[weekDate][person.name]) {
@@ -94,18 +94,20 @@ export default {
 				}
 
 				// Assign out the shifts
+				let workers = shiftWorkers.slice(0) // NOTE: Shallow clone
+
 				pattern.forEach(shift => {
 					let worker = workers.shift()
 					thisWeek[worker] = overrides[worker] || shift
 				})
 
-				// Check for uncovered shifts
-				// TODO: Only call setWarnings if we need to change stuff
-				let warnings = []
+				// Add on the non shift workers if they are covering a shift
+				otherWorkers.forEach(name => { if (overrides[name]) { thisWeek[name] = overrides[name] } })
+
+				// Check for uncovered shifts and add warnings
 				let covered  = Object.values(thisWeek)
 				let missing  = required.filter(shift => !covered.includes(shift))
-				missing.forEach(shift => warnings.push(`No cover for ${shift} shift`))
-				this.$store.commit('setWarnings', { week: weekDate, items: warnings })
+				warnings.push({ week: weekDate, items: missing.map(shift => `No cover for ${shift} shift`) })
 
 				// Rotate the shifts
 				pattern.push(pattern.shift())
@@ -122,6 +124,7 @@ export default {
 				weekNo++
 			}
 
+			warnings.forEach(warning => this.$store.commit('setWarnings', warning))
 			return rota
 		}
 	},
