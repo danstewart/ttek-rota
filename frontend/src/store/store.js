@@ -44,6 +44,7 @@ export const store = new Vuex.Store({
 
 		addNotification(state, notif) {
 			notif.type = notif.type || 'is-primary'
+			notif.id = state.notifications.length
 			state.notifications.push(notif)
 		},
 
@@ -58,7 +59,8 @@ export const store = new Vuex.Store({
 		},
 
 		removeNotification(state, id) {
-			state.notifications.splice(id, 1)
+			let index = state.notifications.findIndex(n => n.id == id)
+			state.notifications.splice(index, 1)
 		},
 		
 		// Emptying

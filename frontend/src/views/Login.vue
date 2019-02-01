@@ -2,8 +2,6 @@
 	<div class='login'>
 		<div class='columns'>
 			<div class='column is-half'>
-				<p class='subtitle'>Enter your email address and you'll receive a magic login link</p>
-
 				<div class='notification is-danger' id='errors' v-if='errors.length'>
 					<p v-for='error in errors' :key='error'>&#8226; {{error}}</p>
 					<button class='delete' @click='errors = []'></button>
@@ -96,12 +94,13 @@ export default {
 
 			try {
 				await axios.post(`${this.endpoint}/register`, { email: email, password: password })
-				this.$store.commit('addNotification', { title: 'Registration successful', subtitle: 'Welcome to the Traveltek Support rota' })
+				this.$store.commit('addNotification', { title: 'Registration successful', subtitle: 'Welcome to the Traveltek Support rota', page: 'home' })
 			} catch (err) {
 				this.errors.push(err.response.data.message || 'Unknown error')
 				return
 			}
 
+			// TODO: Show message saying to check inbox
 			this.login(email, password)
 		},
 

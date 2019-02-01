@@ -8,6 +8,15 @@
 			</div>
 		</section>
 
+		<div class='notifications'>
+			<div v-for='notif in notifications' :key='notif.id' class='notification' :class='notif.type'>
+				<h1 class='title'>{{ notif.title }}</h1>
+				<h1 class='subtitle'>{{ notif.subtitle }}</h1>
+				<button class='delete' @click='$store.commit("removeNotification", notif.id)'></button>
+			</div>
+			<br>
+		</div>
+
 		<div class='main-body'>
 			<router-view></router-view>
 		</div>
@@ -20,6 +29,13 @@
 <script>
 export default {
 	name: 'app',
+
+	computed: {
+		notifications() {
+			let notifs = this.$store.getters.notifications
+			return notifs.filter(n => n.page ? n.page == this.$route.name : true)
+		}
+	}
 }
 </script>
 

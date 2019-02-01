@@ -1,14 +1,5 @@
 <template>
 	<div id='home'>
-		<div class='notifications'>
-			<div v-for='(notif, index) in $store.getters.notifications' :key='index' class='notification' :class='notif.type'>
-				<h1 class='title'>{{ notif.title }}</h1>
-				<h1 class='subtitle'>{{ notif.subtitle }}</h1>
-				<button class='delete' @click='$store.commit("removeNotification", index)'></button>
-			</div>
-			<br>
-		</div>
-
 		<div class='columns'>
 			<div class='column left-pane'>
 				<Rota></Rota>
