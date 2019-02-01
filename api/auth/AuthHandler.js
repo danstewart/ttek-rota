@@ -1,5 +1,5 @@
 const connectToDatabase = require('../db')
-const User = require('../user/User')
+const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs-then')
 

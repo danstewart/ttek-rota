@@ -1,5 +1,5 @@
 const connectToDatabase = require('../db')
-const User = require('./User')
+const User = require('../models/User')
 
 module.exports.getUsers = async (event, context) => {
 	context.callbackWaitsForEmptyEventLoop = false
