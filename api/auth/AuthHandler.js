@@ -59,7 +59,7 @@ module.exports.register = async (event, context) => {
 	try {
 		let user = await User.findOne({ email: body.email })
 
-		if (user.password) {
+		if (user && user.password) {
 			return {
 				statusCode: 422,
 				body: JSON.stringify({
@@ -71,10 +71,10 @@ module.exports.register = async (event, context) => {
 		let password = await bcrypt.hash(body.password, 10)
 
 		// TODO: should be an upsert
-		if (user.id) {
+		if (user && user.id) {
 			await User.update({ _id: user.id }, { password: password })
 		} else {
-			await User.insert({ email: body.email, password: password })
+			await User.collection.insert({ email: body.email, password: password })
 		}
 
 		return {
