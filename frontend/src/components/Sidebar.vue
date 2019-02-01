@@ -11,8 +11,11 @@
 					<br>
 				</li>
 			</ul>
-			<button class='button is-danger' @click='undoChanges'>Reset</button>
-			<button class='button is-primary' @click='saveChanges'>Save</button>
+			<div class='control'>
+				<button class='button is-danger' @click='undoChanges'>Reset</button>
+				<span>&nbsp;</span>
+				<button class='button is-primary' @click='saveChanges'>Save</button>
+			</div>
 		</div>
 		<br>
 
@@ -92,5 +95,9 @@ export default {
 .changes {
 	border: solid 1px black;
 	padding: 10px;
+}
+
+.changes button {
+	width: 70px;
 }
 </style>
