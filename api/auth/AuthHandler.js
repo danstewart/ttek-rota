@@ -57,6 +57,14 @@ module.exports.register = async (event, context) => {
 	// Since support users are loaded before creating accounts we need to 
 	// allow them to add passwords to their existing accounts
 	try {
+		if (body.email.indexOf('@traveltek') == -1)
+			return {
+				statusCode: 403,
+				body: JSON.stringify({
+					message: 'You must register with your Traveltek email address'
+				})
+			}
+
 		let user = await User.findOne({ email: body.email })
 
 		if (user && user.password) {
@@ -106,6 +114,5 @@ async function getToken(eventBody) {
 
 async function checkPassword(reqPass, dbPass) {
 	let match = await bcrypt.compare(reqPass, dbPass)
-	console.log("Match: " + match)
 	return match
 }
