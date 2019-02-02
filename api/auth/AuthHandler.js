@@ -2,6 +2,7 @@ const connectToDatabase = require('../db')
 const User = require('../models/User')
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs-then')
+const res = require('./Response')
 
 module.exports.getToken = async (event, context) => {
 	context.callbackWaitsForEmptyEventLoop = false
@@ -12,38 +13,20 @@ module.exports.getToken = async (event, context) => {
 
 	try {
 		let user  = await User.findOne({ email: body.email })
-
-		if (!user || !user.password) {
-			return {
-				statusCode: 401,
-				body: JSON.stringify({
-					message: 'User does not have an account'
-				})
-			}
+		if (!user || !user.password) { 
+			return res.noAccount()
 		}
 
 		let match = await checkPassword(body.password, user.password)
-
 		if (!match) {
-			return {
-				statusCode: 401,
-				body: JSON.stringify({
-					message: 'Incorrect password'
-				})
-			}
+			return res.incorrectPassword()
 		}
 
 		let auth = await getToken(JSON.parse(event.body))
-		return {
-			statusCode: 200,
-			body: JSON.stringify(auth)
-		}
+		return res.token(auth)
+
 	} catch(err) {
-		return {
-			statusCode: err.statusCode || 500,
-			headers: { 'Content-Type': 'text/plain' },
-			body: err.message
-		}
+		return res.genericError(err)
 	}
 }
 
@@ -57,23 +40,13 @@ module.exports.register = async (event, context) => {
 	// Since support users are loaded before creating accounts we need to 
 	// allow them to add passwords to their existing accounts
 	try {
-		if (body.email.indexOf('@traveltek') == -1)
-			return {
-				statusCode: 403,
-				body: JSON.stringify({
-					message: 'You must register with your Traveltek email address'
-				})
-			}
+		if (body.email.indexOf('@traveltek') == -1) { 
+			return res.nonTraveltek()
+		}
 
 		let user = await User.findOne({ email: body.email })
-
 		if (user && user.password) {
-			return {
-				statusCode: 422,
-				body: JSON.stringify({
-					message: 'A user with that email already exists'
-				})
-			}
+			return res.accountExists()
 		}
 
 		let password = await bcrypt.hash(body.password, 10)
@@ -85,20 +58,10 @@ module.exports.register = async (event, context) => {
 			await User.collection.insert({ email: body.email, password: password })
 		}
 
-		return {
-			status: 200,
-			body: JSON.stringify({
-				success: true,
-				message: 'Successfully created account'
-			})
-		}
+		return res.createdAccount()
 
 	} catch(err) {
-		return {
-			statusCode: err.statusCode || 500,
-			headers: { 'Content-Type': 'text/plain' },
-			body: err.message
-		}
+		res.genericError(err)
 	}
 }
 
