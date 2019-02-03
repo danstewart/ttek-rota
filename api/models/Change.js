@@ -2,11 +2,15 @@ const mongoose = require('mongoose')
 
 // Rota change model
 const ChangeSchema = new mongoose.Schema({
-	date:    String,
-	person:  String,
-	before:  String,
-	after:   String,
-	pending: Boolean,
+	date:      String,
+	person:    String,
+	before:    String,
+	after:     String,
+	pending:   Boolean,
+	changedBy: {
+		type: mongoose.Schema.ObjectId,
+		ref: 'User'
+	}
 })
 
 try {

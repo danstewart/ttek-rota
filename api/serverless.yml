@@ -28,6 +28,7 @@ provider:
     DB: ${self:custom.secrets.DB}
 
 functions:
+  # Auth
   getUsers:
     handler: user/UserHandler.getUsers
     events:
@@ -50,6 +51,23 @@ functions:
       - http:
           path: /register
           method: post
+          cors: true
+
+  # Rota
+  submitChange:
+    handler: rota/RotaHandler.submitChange
+    events:
+      - http:
+          path: /change
+          method: post
+          cors: true
+
+  getChanges:
+    handler: rota/RotaHandler.getChanges
+    events:
+      - http:
+          path: /changes
+          method: get
           cors: true
 
 plugins:
