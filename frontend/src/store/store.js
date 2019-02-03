@@ -1,72 +1,74 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export const store = new Vuex.Store({
 	state: {
-		changes:  {},
+		changes: {},
 		warnings: {},
-		notes:    {},
+		notes: {},
 		notifications: [],
 		token: localStorage.getItem('token') || '',
 	},
-	
+
 	mutations: {
 		// Setting - empty and set
 		setToken(state, token) {
-			state.token = token
-			localStorage.setItem('token', token)
+			state.token = token;
+			localStorage.setItem('token', token);
 		},
 
 		setWarnings(state, warning) {
 			if (warning.items.length == 0) {
-				Vue.delete(state.warnings, warning.week)
-				return
+				Vue.delete(state.warnings, warning.week);
+				return;
 			}
-			
-			Vue.set(state.warnings, warning.week, warning.items)
+
+			Vue.set(state.warnings, warning.week, warning.items);
 		},
 
 		// Appending
 		addChange(state, change) {
 			if (!state.changes.hasOwnProperty(change.week)) {
-				Vue.set(state.changes, change.week, [])
+				Vue.set(state.changes, change.week, []);
 			}
 
 			Vue.set(state.changes[change.week], change.person, {
 				before: change.before,
-				after:  change.after,
+				after: change.after,
 				person: change.person,
-				id:     change.id,
-			})
+				id: change.id,
+			});
 		},
 
 		addNotification(state, notif) {
-			notif.type = notif.type || 'is-primary'
-			notif.id = state.notifications.length
-			state.notifications.push(notif)
+			notif.type = notif.type || 'is-primary';
+			notif.id = state.notifications.length;
+			state.notifications.push(notif);
 		},
 
 		// Removing individual items
 		removeChange(state, change) {
 			if (state.changes.hasOwnProperty(change.week)) {
-				Vue.delete(state.changes[change.week], change.person)
+				Vue.delete(state.changes[change.week], change.person);
 
 				if (Object.keys(state.changes[change.week]) == 0)
-					Vue.delete(state.changes, change.week)
+					Vue.delete(state.changes, change.week);
 			}
 		},
 
 		removeNotification(state, id) {
-			let index = state.notifications.findIndex(n => n.id == id)
-			state.notifications.splice(index, 1)
+			let index = state.notifications.findIndex(n => n.id == id);
+			state.notifications.splice(index, 1);
 		},
-		
+
 		// Emptying
 		emptyChanges(state) {
-			Object.keys(state.changes).forEach(date => Vue.delete(state.changes, date))
-		}
+			Object.keys(state.changes).forEach(date =>
+				Vue.delete(state.changes, date)
+			);
+		},
 	},
 
 	getters: {
@@ -75,5 +77,5 @@ export const store = new Vuex.Store({
 		notes: state => state.notes,
 		token: state => state.token,
 		notifications: state => state.notifications,
-	}
-})
+	},
+});

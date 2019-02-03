@@ -1,22 +1,22 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 // Rota change model
 const ChangeSchema = new mongoose.Schema({
-	date:      String,
-	person:    String,
-	before:    String,
-	after:     String,
-	pending:   Boolean,
+	date: String,
+	person: String,
+	before: String,
+	after: String,
+	pending: Boolean,
 	changedBy: {
 		type: mongoose.Schema.ObjectId,
-		ref: 'User'
-	}
-})
+		ref: 'User',
+	},
+});
 
 try {
-	mongoose.model('Change')
+	mongoose.model('Change');
 } catch {
-	mongoose.model('Change', ChangeSchema)
+	mongoose.model('Change', ChangeSchema);
 }
 
-module.exports = mongoose.model('Change')
+module.exports = mongoose.model('Change');

@@ -9,7 +9,7 @@ module.exports = {
 		statusCode: err.statusCode || 500,
 		headers: { 'Content-Type': 'text/plain' },
 		body: JSON.stringify({
-			message: err.message
-		})
+			message: err.message,
+		}),
 	}),
-}
+};
