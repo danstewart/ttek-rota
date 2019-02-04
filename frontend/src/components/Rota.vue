@@ -20,6 +20,7 @@
 								<select size='1' :id='[index, person].join("_")' @change='changeShift'>
 									<option selected disabled :value='null'>{{ week[person] || 'Day' }}</option>
 									<option v-for='shift in shifts.map(s => s.name).sort()' :key='shift'>{{ shift }}</option>
+									<option>Leave</option>
 								</select>
 							</div>
 						</td>
@@ -248,5 +249,9 @@ table th, table td {
 .Day {
 	height: 2px;
 	border: 2px solid yellow;
+}
+.Leave {
+	height: 2px;
+	border: 2px solid darkgrey;
 }
 </style>
