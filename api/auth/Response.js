@@ -1,4 +1,6 @@
-module.exports = {
+let common = require('../common/Response');
+
+module.exports = Object.assign(common, {
 	// 200
 	createdAccount: () => ({
 		status: 200,
@@ -42,13 +44,4 @@ module.exports = {
 			message: 'A user with that email already exists',
 		}),
 	}),
-
-	// 500
-	genericError: err => ({
-		statusCode: err.statusCode || 500,
-		headers: { 'Content-Type': 'text/plain' },
-		body: JSON.stringify({
-			message: err.message,
-		}),
-	}),
-};
+});
