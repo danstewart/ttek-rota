@@ -46,7 +46,7 @@ export default {
 		// this.shifts is ordered based on a specific date, so get the weeks since that date
 		// so we can adjust the pattern
 		// TODO: Should maybe pull the initial offset from DynamoDB and require a token
-		this.offset = (differenceInCalendarISOWeeks(new Date(2019, 0, 21), new Date()) % 6)
+		this.offset = (differenceInCalendarISOWeeks(new Date(), new Date(2019, 0, 21)) % 6)
 
 		// Used to keep track of changes
 		this.initialRota = this.rota
@@ -193,7 +193,7 @@ export default {
 		},
 
 		next() {
-			this.offset++
+			this.offset = ++this.offset % 6
 			this.startWeek++
 
 			if (this.startWeek > 52) {
@@ -203,7 +203,7 @@ export default {
 		},
 
 		back() {
-			this.offset--
+			this.offset = --this.offset % 6
 			this.startWeek--
 
 			if (this.startWeek < 1) {
