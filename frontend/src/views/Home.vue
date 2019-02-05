@@ -1,6 +1,6 @@
 <template>
 	<div id='home'>
-		<div class='columns'>
+		<div class='columns is-desktop'>
 			<div class='column left-pane'>
 				<Rota></Rota>
 			</div>
