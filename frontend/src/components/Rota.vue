@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { getYear, getISOWeek, addWeeks, startOfWeek, format, differenceInCalendarISOWeeks } from 'date-fns'
+import { getYear, getISOWeek, addWeeks, startOfWeek, format, differenceInCalendarISOWeeks } from 'date-fns';
 
 export default {
 	name: 'Rota',
@@ -46,88 +46,102 @@ export default {
 		// this.shifts is ordered based on a specific date, so get the weeks since that date
 		// so we can adjust the pattern
 		// TODO: Should maybe pull the initial offset from DynamoDB and require a token
-		this.offset = (differenceInCalendarISOWeeks(new Date(), new Date(2019, 0, 21)) % 6)
+		this.offset = differenceInCalendarISOWeeks(new Date(), new Date(2019, 0, 21)) % 6;
 
 		// Used to keep track of changes
-		this.initialRota = this.rota
+		this.initialRota = this.rota;
 	},
 
 	computed: {
 		rota() {
-			let [ week, year, limit ] = [ this.startWeek, this.startYear, 10 ]
+			let [week, year, limit] = [this.startWeek, this.startYear, 10];
 
 			// Fetch out the required shift info
-			let shifts   = this.shifts.slice().sort((a, b) => a.orderid - b.orderid)
-			let pattern  = shifts.map(shift => shift.name)
-			let required = shifts.filter(shift => shift.required).map(shift => shift.name)
+			let shifts = this.shifts.slice().sort((a, b) => a.orderid - b.orderid);
+			let pattern = shifts.map(shift => shift.name);
+			let required = shifts.filter(shift => shift.required).map(shift => shift.name);
 
 			// Fetch out the required staff info
-			let people = this.staff.slice().sort((a, b) => a.orderid - b.orderid)
-			let shiftWorkers = people.filter(person => person.shifts).map(person => person.name)
-			let otherWorkers = people.filter(person => !person.shifts).map(person => person.name)
+			let people = this.staff.slice().sort((a, b) => a.orderid - b.orderid);
+			let shiftWorkers = people.filter(person => person.shifts).map(person => person.name);
+			let otherWorkers = people.filter(person => !person.shifts).map(person => person.name);
 
-			let rota   = []
-			let weekNo = week
+			let rota = [];
+			let weekNo = week;
 
-			let changes  = this.$store.getters.changes
-			let warnings = []
+			let changes = this.$store.getters.changes;
+			let warnings = [];
 
 			// Rotate shift pattern $offset times
 			if (this.offset > 0) {
-				[...Array(this.offset)].map(() => pattern.push(pattern.shift()))
+				[...Array(this.offset)].map(() => pattern.push(pattern.shift()));
 			} else if (this.offset < 0) {
-				[...Array(Math.abs(this.offset))].map(() => pattern.unshift(pattern.pop()))
+				[...Array(Math.abs(this.offset))].map(() => pattern.unshift(pattern.pop()));
 			}
 
 			// Build the rota
 			while (rota.length < limit) {
-				let thisWeek = {}
-				let weekDate = format(startOfWeek(addWeeks(new Date(year, 0, 1), weekNo - 1), { weekStartsOn: 1 }), 'DD MMM YYYY')
+				let thisWeek = {};
+				let weekDate = format(
+					startOfWeek(addWeeks(new Date(year, 0, 1), weekNo - 1), {
+						weekStartsOn: 1,
+					}),
+					'DD MMM YYYY'
+				);
 
 				// Check for changes
-				let overrides = {}
+				let overrides = {};
 				if (changes[weekDate]) {
 					people.forEach(person => {
 						if (changes[weekDate][person.name]) {
-							overrides[person.name] = changes[weekDate][person.name].after
+							overrides[person.name] = changes[weekDate][person.name].after;
 						}
-					})
+					});
 				}
 
 				// Assign out the shifts
-				let workers = shiftWorkers.slice(0) // NOTE: Shallow clone
+				let workers = shiftWorkers.slice(0); // NOTE: Shallow clone
 
 				pattern.forEach(shift => {
-					let worker = workers.shift()
-					thisWeek[worker] = overrides[worker] || shift
-				})
+					let worker = workers.shift();
+					thisWeek[worker] = overrides[worker] || shift;
+				});
 
 				// Add on the non shift workers if they are covering a shift
-				otherWorkers.forEach(name => { if (overrides[name]) { thisWeek[name] = overrides[name] } })
+				otherWorkers.forEach(name => {
+					if (overrides[name]) {
+						thisWeek[name] = overrides[name];
+					}
+				});
 
 				// Check for uncovered shifts and add warnings
-				let covered  = Object.values(thisWeek)
-				let missing  = required.filter(shift => !covered.includes(shift))
-				warnings.push({ week: weekDate, items: missing.map(shift => `No cover for ${shift} shift`) })
+				let covered = Object.values(thisWeek);
+				let missing = required.filter(shift => !covered.includes(shift));
+				warnings.push({
+					week: weekDate,
+					items: missing.map(shift => `No cover for ${shift} shift`),
+				});
 
 				// Rotate the shifts
-				pattern.push(pattern.shift())
+				pattern.push(pattern.shift());
 
 				// Add this week to the rota
-				rota.push(Object.assign(thisWeek, {
-					weekNo: weekNo,
-					date: weekDate,
+				rota.push(
+					Object.assign(thisWeek, {
+						weekNo: weekNo,
+						date: weekDate,
 
-					// TODO: Add note functionality
-					notes: ['Test note'],
-				}))
+						// TODO: Add note functionality
+						notes: ['Test note'],
+					})
+				);
 
-				weekNo++
+				weekNo++;
 			}
 
-			warnings.forEach(warning => this.$store.commit('setWarnings', warning))
-			return rota
-		}
+			warnings.forEach(warning => this.$store.commit('setWarnings', warning));
+			return rota;
+		},
 	},
 
 	data() {
@@ -143,76 +157,76 @@ export default {
 			// We work a standard shift pattern that repeats every 6 weeks
 			// The order id is used for the order we work the shifts
 			shifts: [
-				{ name: 'Early', required: true,  orderid: 1 },
-				{ name: 'Sat',   required: true,  orderid: 2 },
-				{ name: 'Back',  required: true,  orderid: 3 },
-				{ name: 'Day',  required: false,  orderid: 4 },
-				{ name: 'Night', required: true,  orderid: 5 },
-				{ name: 'Day4',  required: false, orderid: 6 },
+				{ name: 'Early', required: true, orderid: 1 },
+				{ name: 'Sat', required: true, orderid: 2 },
+				{ name: 'Back', required: true, orderid: 3 },
+				{ name: 'Day', required: false, orderid: 4 },
+				{ name: 'Night', required: true, orderid: 5 },
+				{ name: 'Day4', required: false, orderid: 6 },
 			],
 
 			// List of staff, the order they are in the rota and whether
 			// they work shifts or not
 			staff: [
-				{ name: 'Jamie',     shifts: true, orderid: 1 },
-				{ name: 'Dan',       shifts: true, orderid: 2 },
-				{ name: 'Bogdan',    shifts: true, orderid: 3 },
-				{ name: 'Mat',       shifts: true, orderid: 4 },
+				{ name: 'Jamie', shifts: true, orderid: 1 },
+				{ name: 'Dan', shifts: true, orderid: 2 },
+				{ name: 'Bogdan', shifts: true, orderid: 3 },
+				{ name: 'Mat', shifts: true, orderid: 4 },
 				{ name: 'Michael M', shifts: true, orderid: 5 },
 				{ name: 'Michael P', shifts: true, orderid: 6 },
 
-				{ name: 'Bryan',     shifts: false, orderid: 7 },
-				{ name: 'Brian',     shifts: false, orderid: 8 },
+				{ name: 'Bryan', shifts: false, orderid: 7 },
+				{ name: 'Brian', shifts: false, orderid: 8 },
 			],
-		}
+		};
 	},
 
 	methods: {
 		changeShift(e) {
-			let [weekIndex, person] = e.target.id.split('_')
+			let [weekIndex, person] = e.target.id.split('_');
 
-			let week   = this.rota[weekIndex]
-			let ogWeek = this.initialRota[weekIndex]
+			let week = this.rota[weekIndex];
+			let ogWeek = this.initialRota[weekIndex];
 
 			let change = {
-				person:   person,
-				week:     week.date,
-				before:   ogWeek[person] || 'Day',
-				after:    e.target.value,
-				id:       e.target.id,
-			}
+				person: person,
+				week: week.date,
+				before: ogWeek[person] || 'Day',
+				after: e.target.value,
+				id: e.target.id,
+			};
 
 			// If this change is the same as the original rota then remove it and bail
 			if (change.before == change.after) {
-				this.$store.commit('removeChange', change)
+				this.$store.commit('removeChange', change);
 
-			// Otherwise save the change
+				// Otherwise save the change
 			} else {
-				this.$store.commit('addChange', change)
+				this.$store.commit('addChange', change);
 			}
 		},
 
 		next() {
-			this.offset = ++this.offset % 6
-			this.startWeek++
+			this.offset = ++this.offset % 6;
+			this.startWeek++;
 
 			if (this.startWeek > 52) {
-				this.startWeek = 1
-				this.startYear++
+				this.startWeek = 1;
+				this.startYear++;
 			}
 		},
 
 		back() {
-			this.offset = --this.offset % 6
-			this.startWeek--
+			this.offset = --this.offset % 6;
+			this.startWeek--;
 
 			if (this.startWeek < 1) {
-				this.startWeek = 52
-				this.startYear--
+				this.startWeek = 52;
+				this.startYear--;
 			}
-		}
+		},
 	},
-}
+};
 </script>
 
 <style scoped>
@@ -220,7 +234,8 @@ export default {
 	margin-left: 25px;
 }
 
-table th, table td {
+table th,
+table td {
 	display: table-cell;
 	vertical-align: middle;
 }

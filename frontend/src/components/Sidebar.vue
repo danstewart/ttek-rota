@@ -44,18 +44,17 @@ export default {
 	name: 'Sidebar',
 
 	data() {
-		return {
-		}
+		return {};
 	},
 
 	computed: {
 		warnings() {
-			return this.$store.getters.warnings
+			return this.$store.getters.warnings;
 		},
 
 		changes() {
-			return this.$store.getters.changes
-		}
+			return this.$store.getters.changes;
+		},
 	},
 
 	methods: {
@@ -68,30 +67,30 @@ export default {
 			// on <select> elements does not reset when the rota changes
 			// So this will go through and reset them all manually
 
-			let dropdowns = []
-			let changes   = this.$store.getters.changes
+			let dropdowns = [];
+			let changes = this.$store.getters.changes;
 
 			// Get a list of all dropdowns that need to be reset
 			Object.keys(changes).forEach(dt => {
 				Object.keys(changes[dt]).forEach(person => {
-					let change = changes[dt][person]
-					dropdowns.push(change.id)
-				})
-			})
+					let change = changes[dt][person];
+					dropdowns.push(change.id);
+				});
+			});
 
 			// Wipe out the changes from Vuex
-			this.$store.commit('emptyChanges')
+			this.$store.commit('emptyChanges');
 
 			// Wait for DOM to update then reset the dropdowns
 			this.$nextTick(() => {
-				dropdowns.forEach(id => document.getElementById(id).selectedIndex = 0)
-			})
-		}
-	}
-}
+				dropdowns.forEach(id => (document.getElementById(id).selectedIndex = 0));
+			});
+		},
+	},
+};
 </script>
 
-<style scoped>	
+<style scoped>
 .changes {
 	border: solid 1px black;
 	padding: 10px;

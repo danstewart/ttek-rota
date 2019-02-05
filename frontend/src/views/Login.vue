@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
 	name: 'Login',
@@ -60,71 +60,71 @@ export default {
 			endpoint: 'http://127.0.0.1:3000',
 			registering: false,
 			errors: [],
-		}
+		};
 	},
 
 	methods: {
 		async login() {
-			let email    = document.getElementById('email').value
-			let password = document.getElementById('password').value
+			let email = document.getElementById('email').value;
+			let password = document.getElementById('password').value;
 
 			// Validate
-			this.validate(email, password)
-			if (this.errors.length) { return }
-
-			try {
-				let res = await axios.post(`${this.endpoint}/token`, { email: email, password: password })
-				this.$store.commit('setToken', res.data.token)
-			} catch (err) {
-				this.errors.push(err.response.data.message || 'Unknown error')
-				return
+			this.validate(email, password);
+			if (this.errors.length) {
+				return;
 			}
 
-			this.$router.push('/')
+			try {
+				let res = await axios.post(`${this.endpoint}/token`, { email: email, password: password });
+				this.$store.commit('setToken', res.data.token);
+			} catch (err) {
+				this.errors.push(err.response.data.message || 'Unknown error');
+				return;
+			}
+
+			this.$router.push('/');
 		},
 
 		async register() {
-			let email           = document.getElementById('email').value
-			let password        = document.getElementById('password').value
-			let passwordConfirm = document.getElementById('password-confirm').value
+			let email = document.getElementById('email').value;
+			let password = document.getElementById('password').value;
+			let passwordConfirm = document.getElementById('password-confirm').value;
 
 			// Validate
-			this.validate(email, password, passwordConfirm)
-			if (this.errors.length) { return }
+			this.validate(email, password, passwordConfirm);
+			if (this.errors.length) {
+				return;
+			}
 
 			try {
-				await axios.post(`${this.endpoint}/register`, { email: email, password: password })
-				this.$store.commit('addNotification', { title: 'Registration successful', subtitle: 'Welcome to the Traveltek Support rota', page: 'home' })
+				await axios.post(`${this.endpoint}/register`, { email: email, password: password });
+				this.$store.commit('addNotification', { title: 'Registration successful', subtitle: 'Welcome to the Traveltek Support rota', page: 'home' });
 			} catch (err) {
-				this.errors.push(err.response.data.message || 'Unknown error')
-				return
+				this.errors.push(err.response.data.message || 'Unknown error');
+				return;
 			}
 
 			// TODO: Show message saying to check inbox
-			this.login(email, password)
+			this.login(email, password);
 		},
 
 		validate(email, password, passwordConfirm = '') {
-			this.errors = [] //reset
+			this.errors = []; //reset
 
-			if (email == '') 
-				this.errors.push('Email cannot be blank')
+			if (email == '') this.errors.push('Email cannot be blank');
 
 			// Registering
 			if (passwordConfirm != '') {
-				if (password.length < 8)
-					this.errors.push('Password should be at least 8 characters')
+				if (password.length < 8) this.errors.push('Password should be at least 8 characters');
 
-				if (password != passwordConfirm)
-					this.errors.push('Passwords do not match')
+				if (password != passwordConfirm) this.errors.push('Passwords do not match');
 			} else {
-				if (password == '')
-					this.errors.push('Password cannot be blank')
+				if (password == '') this.errors.push('Password cannot be blank');
 			}
 		},
-	}
-}
+	},
+};
 </script>
 
-<style scoped>	
+<style scoped>
 </style>

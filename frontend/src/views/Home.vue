@@ -12,16 +12,16 @@
 </template>
 
 <script>
-import Rota from '../components/Rota.vue'
-import Sidebar from '../components/Sidebar.vue'
+import Rota from '../components/Rota.vue';
+import Sidebar from '../components/Sidebar.vue';
 
 export default {
 	name: 'home',
 	components: {
 		Rota,
 		Sidebar,
-	}
-}
+	},
+};
 </script>
 
 <style>

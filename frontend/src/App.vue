@@ -32,11 +32,11 @@ export default {
 
 	computed: {
 		notifications() {
-			let notifs = this.$store.getters.notifications
-			return notifs.filter(n => n.page ? n.page == this.$route.name : true)
-		}
-	}
-}
+			let notifs = this.$store.getters.notifications;
+			return notifs.filter(n => (n.page ? n.page == this.$route.name : true));
+		},
+	},
+};
 </script>
 
 <style>
