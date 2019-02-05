@@ -11,8 +11,9 @@
 			<tbody>
 				<template v-for='(week, index) in rota'>
 					<tr :key='index'>
-						<!-- TODO: Expand button for notes -->
-						<td><!-- <ExpandBtn></ExpandBtn> --></td>
+						<td>
+							<button class='button' style='width: 40px' @click='toggle(index)'>{{ isExpanded(index) ? '-' : '+' }}</button>
+						</td>
 						<td>{{ week.date }}</td>
 						<td v-for='person in staff.map(p => p.name)' :key='person'>
 							<div :class='week[person] || "Day"'></div>
@@ -25,6 +26,17 @@
 							</div>
 						</td>
 					</tr>
+					<template v-if='isExpanded(index)'>
+						<template v-for='day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]'>
+							<tr>
+								<td></td>
+								<td>{{ day }}</td>
+								<td v-for='person in staff.map(p => p.name)' :key='person'>
+									<!-- TODO: Show notes for each day here -->
+								</td>
+							</tr>
+						</template>
+					</template>
 				</template>
 			</tbody>
 		</table>
@@ -151,7 +163,8 @@ export default {
 			startYear: getYear(new Date()),
 			offset: 0,
 
-			//rota: [],
+			expanded: [],
+
 			initialRota: [], // to keep track of unsaved changes
 
 			// We work a standard shift pattern that repeats every 6 weeks
@@ -225,13 +238,27 @@ export default {
 				this.startYear--;
 			}
 		},
+
+		toggle(index) {
+			let i = this.expanded.indexOf(index);
+
+			if (i > -1) {
+				this.expanded.splice(i, 1);
+			} else {
+				this.expanded.push(index);
+			}
+		},
+
+		isExpanded(index) {
+			return this.expanded.indexOf(index) > -1;
+		},
 	},
 };
 </script>
 
 <style scoped>
 .control {
-	margin-left: 25px;
+	margin-left: 10px;
 }
 
 table th,
