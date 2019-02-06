@@ -27,12 +27,13 @@
 						</td>
 					</tr>
 					<template v-if='isExpanded(index)'>
+						<!-- TODO: In progress -->
 						<template v-for='day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]'>
-							<tr>
+							<tr v-if='day in week.notes'>
 								<td></td>
 								<td>{{ day }}</td>
 								<td v-for='person in staff.map(p => p.name)' :key='person'>
-									<!-- TODO: Show notes for each day here -->
+									{{ week.notes[day][person] }}
 								</td>
 							</tr>
 						</template>
@@ -143,8 +144,11 @@ export default {
 						weekNo: weekNo,
 						date: weekDate,
 
-						// TODO: Add note functionality
-						notes: ['Test note'],
+						// TODO: Dummy notes for testing
+						notes: {
+							Monday: { Dan: 'Early shift', Mat: 'Day shift' },
+							Friday: { Dan: 'Back shift' },
+						},
 					})
 				);
 
