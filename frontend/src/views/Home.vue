@@ -4,7 +4,7 @@
 			<div class='column left-pane'>
 				<Rota></Rota>
 			</div>
-			<div class='column is-4 right-pane'>
+			<div class='column is-3 right-pane'>
 				<Sidebar></Sidebar>
 			</div>
 		</div>
