@@ -28,8 +28,8 @@
 					</tr>
 					<template v-if='isExpanded(index)'>
 						<!-- TODO: In progress -->
-						<template v-for='day in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]'>
-							<tr v-if='day in week.notes'>
+						<template v-for='(day, index) in ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]'>
+							<tr v-if='day in week.notes' :key='index'>
 								<td></td>
 								<td>{{ day }}</td>
 								<td v-for='person in staff.map(p => p.name)' :key='person'>
