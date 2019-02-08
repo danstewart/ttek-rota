@@ -1,8 +1,9 @@
 const connectToDatabase = require('../db');
 const User = require('../models/User');
-const jwt = require('jsonwebtoken');
+const token = require('./Token');
 const bcrypt = require('bcryptjs-then');
 const res = require('./Response');
+const sendgrid = require('@sendgrid/mail');
 
 module.exports.getToken = async (event, context) => {
 	context.callbackWaitsForEmptyEventLoop = false;
@@ -15,6 +16,10 @@ module.exports.getToken = async (event, context) => {
 		let user = await User.findOne({ email: body.email });
 		if (!user || !user.password) {
 			return res.noAccount();
+		}
+
+		if (user && !user.verified) {
+			return res.notVerified();
 		}
 
 		let match = await checkPassword(body.password, user.password);
@@ -57,20 +62,55 @@ module.exports.register = async (event, context) => {
 			await User.collection.insert({ email: body.email, password: password });
 		}
 
+		// Send email with login token
+		const auth = await getToken(JSON.parse(event.body));
+		const link = `${process.env.URL}/auth?token=${auth.token}&verify=1`;
+
+		const msg = {
+			to: body.email,
+			from: 'Ttek Rota <rota@traveltek.net>',
+			subject: 'Welcome to the Ttek Rota',
+			text: `Click the below link to log in:\n${link}`,
+			html: `Click <a href="${link}">here</a> to log in.`,
+		};
+
+		sendgrid.setApiKey(process.env.SENDGRID_KEY);
+		sendgrid.send(msg);
+
 		return res.createdAccount();
 	} catch (err) {
 		res.genericError(err);
 	}
 };
 
-// Helper Methods
-function signToken(id) {
-	return jwt.sign({ id: id }, process.env.JWT_SECRET, { expiresIn: 86400 });
-}
+module.exports.verify = async (event, context) => {
+	context.callbackWaitsForEmptyEventLoop = false;
 
+	await connectToDatabase();
+
+	let body = JSON.parse(event.body);
+
+	try {
+		let payload = token.verify(body.token);
+		let user = await User.findOne({ email: payload.email });
+
+		if (user) {
+			await User.update({ _id: user.id }, { verified: true });
+		} else {
+			return res.noAccount();
+		}
+
+		console.log(res.noContent());
+		return res.noContent();
+	} catch (err) {
+		res.genericError(err);
+	}
+};
+
+// Helper Methods
 async function getToken(eventBody) {
 	let user = await User.findOne({ email: eventBody.email });
-	return { auth: true, token: signToken(user._id) };
+	return { auth: true, token: token.sign(user._id, eventBody.email) };
 }
 
 async function checkPassword(reqPass, dbPass) {

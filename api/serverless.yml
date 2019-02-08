@@ -26,6 +26,8 @@ provider:
   environment:
     JWT_SECRET: ${self:custom.secrets.JWT_SECRET}
     DB: ${self:custom.secrets.DB}
+    SENDGRID_KEY: ${self:custom.secrets.SENDGRID_KEY}
+    URL: 'http://127.0.0.1:8080/#'
 
 functions:
   # Auth
@@ -50,6 +52,14 @@ functions:
     events:
       - http:
           path: /register
+          method: post
+          cors: true
+
+  verify:
+    handler: auth/AuthHandler.verify
+    events:
+      - http:
+          path: /verify
           method: post
           cors: true
 

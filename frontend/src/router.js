@@ -20,5 +20,10 @@ export default new Router({
 			component: Login,
 			meta: { title: `${document.title} | Login` },
 		},
+		{
+			path: '/auth',
+			name: 'auth',
+			meta: { title: `${document.title} | Auth` },
+		},
 	],
 });

@@ -1,7 +1,7 @@
 module.exports = {
 	// 204
 	noContent: () => ({
-		status: 204,
+		statusCode: 204,
 	}),
 
 	// 500

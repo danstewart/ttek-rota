@@ -1,6 +1,9 @@
 <template>
 	<div class='login'>
-		<div class='columns'>
+		<div v-if='registered'>
+			<p class='subtitle'>You have successfully registered, check your inbox for a confirmation email</p>
+		</div>
+		<div class='columns' v-else>
 			<div class='column is-half'>
 				<div class='notification is-danger' id='errors' v-if='errors.length'>
 					<p v-for='error in errors' :key='error'>&#8226; {{error}}</p>
@@ -51,14 +54,15 @@
 
 <script>
 import axios from 'axios';
+import config from '../config';
 
 export default {
 	name: 'Login',
 
 	data() {
 		return {
-			endpoint: 'http://127.0.0.1:3000',
 			registering: false,
+			registered: false,
 			errors: [],
 		};
 	},
@@ -75,7 +79,7 @@ export default {
 			}
 
 			try {
-				let res = await axios.post(`${this.endpoint}/token`, { email: email, password: password });
+				let res = await axios.post(`${config.endpoint}/token`, { email: email, password: password });
 				this.$store.commit('setToken', res.data.token);
 			} catch (err) {
 				this.errors.push(err.response.data.message || 'Unknown error');
@@ -97,15 +101,14 @@ export default {
 			}
 
 			try {
-				await axios.post(`${this.endpoint}/register`, { email: email, password: password });
+				await axios.post(`${config.endpoint}/register`, { email: email, password: password });
 				this.$store.commit('addNotification', { title: 'Registration successful', subtitle: 'Welcome to the Traveltek Support rota', page: 'home' });
 			} catch (err) {
 				this.errors.push(err.response.data.message || 'Unknown error');
 				return;
 			}
 
-			// TODO: Show message saying to check inbox
-			this.login(email, password);
+			this.registered = true;
 		},
 
 		validate(email, password, passwordConfirm = '') {

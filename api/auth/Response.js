@@ -3,7 +3,7 @@ let common = require('../common/Response');
 module.exports = Object.assign(common, {
 	// 200
 	createdAccount: () => ({
-		status: 200,
+		statusCode: 200,
 		body: JSON.stringify({
 			message: 'Successfully created account',
 		}),
@@ -34,6 +34,13 @@ module.exports = Object.assign(common, {
 		statusCode: 403,
 		body: JSON.stringify({
 			message: 'You must register with your Traveltek email address',
+		}),
+	}),
+
+	notVerified: () => ({
+		statusCode: 403,
+		body: JSON.stringify({
+			message: 'You must verify your email address before logging in',
 		}),
 	}),
 
